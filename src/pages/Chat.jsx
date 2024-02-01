@@ -13,7 +13,7 @@ const Chat = () => {
     } = useContext(ChatContext);
 
     return ( <Container>
-        {userChats.length < 1 ? null : 
+        {userChats && userChats.length ?
         <Stack direction="horizontal" gap={4} className="align-items-start">
             <Stack className="flex-grow-0 messages-box pe-3" gap={3}>
                 { isUserChatsLoading && <p>Loading Chats...</p>}
@@ -28,7 +28,7 @@ const Chat = () => {
                 }
             </Stack>
             <p>ChatBox</p>
-        </Stack> }
+        </Stack> : null }
     </Container>);
 }
  
