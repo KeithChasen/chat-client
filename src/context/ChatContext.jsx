@@ -21,7 +21,9 @@ export const ChatContextProvider = ({ children, user }) => {
             const pChats = response.filter(u => {
                 let isChatCreated = false;
 
-                if (user._id === u._id) return false;
+                console.log(user, 'U')
+
+                if (user && user._id === u._id) return false;
                 
                 if (userChats) {
                     isChatCreated = userChats.some(chat => {
