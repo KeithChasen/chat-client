@@ -1,10 +1,14 @@
-import { createContext, useCallback, useEffect, useState } from "react";
+import { createContext, useContext, useCallback, useEffect, useState } from "react";
 import { baseUrl, getRequest, postRequest } from "../utils/services";
+import { AuthContext } from "./AuthContext";
 
 export const ChatContext = createContext();
 
-export const ChatContextProvider = ({ children, user }) => {
-    const [userChats, setUserChats] = useState(null);
+export const ChatContextProvider = ({ children }) => {
+
+    const { user } = useContext(AuthContext);
+
+    const [userChats, setUserChats] = useState([]);
     const [isUserChatsLoading, setIsUserChatsLoading] = useState(false);
     const [userChatsError, setUserChatsError] = useState(null);
     const [potentialChats, setPotentialChats] = useState([]);
@@ -27,11 +31,13 @@ export const ChatContextProvider = ({ children, user }) => {
             const pChats = response.filter(u => {
                 let isChatCreated = false;
 
-                if (user && user._id === u._id) return false;
+                if (user && user.id === u.id) {
+                    return false;
+                }
                 
                 if (userChats) {
                     isChatCreated = userChats.some(chat => {
-                        return chat.members[0] === u._id || chat.members[1] === u._id
+                        return chat.members[0] === u.id || chat.members[1] === u._id
                     })
                 }
 
@@ -43,15 +49,15 @@ export const ChatContextProvider = ({ children, user }) => {
 
         getUsers();
 
-    }, [userChats]);
+    }, [user]);
 
     useEffect(() => {
         const getUserChats = async () => {
-            if (user && user._id) {
+            if (user && user.id) {
                 setIsUserChatsLoading(true);
                 setUserChatsError(null);
 
-                const response = await getRequest(`${baseUrl}/chats/${user._id}`);
+                const response = await getRequest(`${baseUrl}/chats/${user.id}`);
 
                 setIsUserChatsLoading(false);
 
@@ -97,11 +103,13 @@ export const ChatContextProvider = ({ children, user }) => {
             JSON.stringify({ firstId, secondId })
         );
 
+        console.log(response, 'RES create chat')
+
         if (response.error) {
             return console.log('Error creating chat', response)
         }
 
-        setUserChats(prev => [...prev, response]);
+        setUserChats([...userChats, response]);
     }, [])
 
     const sendTextMessage = useCallback(async (textMessage, sender, currentChatId, setTextMessage) => {

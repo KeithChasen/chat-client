@@ -5,7 +5,19 @@ export const useFetchRecipient = ( chat, user ) => {
     const [recipientUser, setRecipientUser] = useState(null);
     const [error, setError] = useState(null)
 
-    const recipientId = chat && chat.members.find(id => id !== user._id)
+    const findRecipientId = (chat) => {
+        if (!chat) {
+            return null;
+        }
+
+        if (chat.firstMember !== user.id) {
+            return chat.firstMember;
+        }
+
+        return chat.secondMember;
+    }
+
+    const recipientId = findRecipientId(chat);
 
     useEffect(() => {
         const getUser = async () => {

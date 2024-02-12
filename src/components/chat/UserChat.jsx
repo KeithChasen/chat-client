@@ -18,7 +18,7 @@ const UserChat = ({ chat, user }) => {
                 </div>
                 <div className="text-content">
                     <div className="name">
-                        {recipientUser && recipientUser.name}
+                        {recipientUser && recipientUser.email}
                     </div>
                     <div className="text">
                         Text Message
