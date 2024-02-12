@@ -36,9 +36,12 @@ export const ChatContextProvider = ({ children }) => {
                 }
                 
                 if (userChats) {
-                    isChatCreated = userChats.some(chat => {
-                        return chat.members[0] === u.id || chat.members[1] === u._id
-                    })
+                    isChatCreated = userChats.filter(
+                        chat => 
+                            chat.firstMember !== user.id || 
+                            chat.secondMember !== user.id
+                        )
+
                 }
 
                 return !isChatCreated;
