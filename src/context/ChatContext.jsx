@@ -81,7 +81,7 @@ export const ChatContextProvider = ({ children }) => {
                 setMessagesLoading(true);
                 setMessagesError(null);
     
-                const response = await getRequest(`${baseUrl}/messages/${currentChat._id}`);
+                const response = await getRequest(`${baseUrl}/messages/${currentChat.id}`);
     
                 setMessagesLoading(false);
     

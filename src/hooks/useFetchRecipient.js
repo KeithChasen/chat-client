@@ -23,7 +23,7 @@ export const useFetchRecipient = ( chat, user ) => {
         const getUser = async () => {
             if (!recipientId) return null;
 
-            const response = await getRequest(`${baseUrl}/users/find/${recipientId}`);
+            const response = await getRequest(`${baseUrl}/users/${recipientId}`);
 
             if (response.error) {
                 return setError(response);
