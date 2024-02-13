@@ -120,7 +120,7 @@ export const ChatContextProvider = ({ children }) => {
 
         const response = await postRequest(`${baseUrl}/messages`, JSON.stringify({
             chatId: currentChatId,
-            senderId: sender._id,
+            senderId: sender.id,
             text: textMessage
         }));
 
