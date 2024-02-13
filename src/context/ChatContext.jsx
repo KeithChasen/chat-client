@@ -1,6 +1,7 @@
 import { createContext, useContext, useCallback, useEffect, useState } from "react";
 import { baseUrl, getRequest, postRequest } from "../utils/services";
 import { AuthContext } from "./AuthContext";
+import { io } from "socket.io-client";
 
 export const ChatContext = createContext();
 
@@ -18,6 +19,13 @@ export const ChatContextProvider = ({ children }) => {
     const [messagesError, setMessagesError] = useState(null);
     const [sendTextMessageError, setSendTextMessageError] = useState(null);
     const [newMessage, setNewMessage] = useState(null);
+
+    const [socket, setSocket] = useState(null);
+
+    useEffect(() => {
+        const newSocket = io(import.meta.env.VITE_APP_SERVER);
+        setSocket(newSocket);
+    }, [user]);
 
     useEffect(() => {
 
