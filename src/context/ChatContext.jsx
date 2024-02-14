@@ -21,11 +21,31 @@ export const ChatContextProvider = ({ children }) => {
     const [newMessage, setNewMessage] = useState(null);
 
     const [socket, setSocket] = useState(null);
+    const [onlineUsers, setOnlineUsers] = useState([]);
 
     useEffect(() => {
         const newSocket = io(import.meta.env.VITE_APP_SERVER);
         setSocket(newSocket);
+
+        return () => {
+            newSocket.disconnect();
+        }
     }, [user]);
+
+    useEffect(() => {
+
+        console.log('socket changed')
+
+        if (!socket || !user) return;
+        socket.emit('addNewUser', user.id);
+        socket.on('getOnlineUsers', res => {
+
+            console.log(res, 'res online users')
+
+            setOnlineUsers(res);
+
+        })
+    }, [socket]);
 
     useEffect(() => {
 
@@ -43,16 +63,15 @@ export const ChatContextProvider = ({ children }) => {
                     return false;
                 }
                 
-                if (userChats) {
+                if (userChats.length) {
                     isChatCreated = userChats.filter(
                         chat => 
-                            chat.firstMember !== user.id || 
-                            chat.secondMember !== user.id
-                        )
-
+                            chat.firstMember === u.id || 
+                            chat.secondMember === u.id
+                        );
                 }
 
-                return !isChatCreated;
+                return !isChatCreated.length;
             });
 
             setPotentialChats(pChats);
@@ -60,7 +79,7 @@ export const ChatContextProvider = ({ children }) => {
 
         getUsers();
 
-    }, [user]);
+    }, [userChats]);
 
     useEffect(() => {
         const getUserChats = async () => {
@@ -153,7 +172,8 @@ export const ChatContextProvider = ({ children }) => {
             messagesLoading,
             messagesError,
             currentChat,
-            sendTextMessage
+            sendTextMessage,
+            onlineUsers
         }}
     >{children}</ChatContext.Provider>
 }
