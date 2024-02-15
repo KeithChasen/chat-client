@@ -2,6 +2,7 @@ import { createContext, useContext, useCallback, useEffect, useState } from "rea
 import { baseUrl, getRequest, postRequest } from "../utils/services";
 import { AuthContext } from "./AuthContext";
 import { io } from "socket.io-client";
+import { findRecipientId } from "../hooks/useFetchRecipient";
 
 export const ChatContext = createContext();
 
@@ -23,6 +24,7 @@ export const ChatContextProvider = ({ children }) => {
     const [socket, setSocket] = useState(null);
     const [onlineUsers, setOnlineUsers] = useState([]);
 
+    // connect socket
     useEffect(() => {
         const newSocket = io(import.meta.env.VITE_APP_SERVER);
         setSocket(newSocket);
@@ -32,6 +34,7 @@ export const ChatContextProvider = ({ children }) => {
         }
     }, [user]);
 
+    // get online users
     useEffect(() => {
         if (!socket || !user) return;
         socket.emit('addNewUser', user.id);
@@ -43,6 +46,33 @@ export const ChatContextProvider = ({ children }) => {
             socket.off('getOnlineUsers');
         }
     }, [socket]);
+
+    // send message
+    useEffect(() => {
+        if (!socket || !user) return;
+
+        const recipientId = findRecipientId(currentChat, user);
+
+        socket.emit('sendMessage', { ...newMessage, recipientId })
+    }, [newMessage]);
+
+    // receive message 
+    useEffect(() => {
+        if (!socket || !user ) return;
+
+        socket.on('getMessage', res => {
+            if (
+                !currentChat || 
+                currentChat.id !== res.chatId
+            ) return; 
+
+            setMessages(prev => [...prev, res]);
+        });
+
+        return () => {
+            socket.off('getMessage');
+        }
+    }, [socket, currentChat]);
 
     useEffect(() => {
 
